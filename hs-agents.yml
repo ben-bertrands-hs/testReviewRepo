@@ -1,0 +1,14 @@
+pr-review:
+  generic:
+    enabled: true
+    agents:
+      - plugins/kairos-pilot-2/agents/generic-pr-review-security.md
+      - plugins/kairos-pilot-2/agents/generic-pr-review-code-quality.md
+      - plugins/kairos-pilot-2/agents/generic-pr-review-performance.md
+      - plugins/kairos-pilot-2/agents/generic-pr-review-documentation.md
+      - plugins/kairos-pilot-2/agents/generic-pr-review-description-alignment.md
+      - plugins/kairos-pilot-2/agents/generic-pr-review-agents-md.md
+  renovate:
+    enabled: true
+    agents:
+      - plugins/kairos-pilot-2/agents/renovate-pr-review-for-python.md
