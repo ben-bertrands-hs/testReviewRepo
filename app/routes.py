@@ -42,7 +42,7 @@ def search_notes():
     offset = page * config.PAGE_SIZE
 
     rows = db.query(
-        f"SELECT * FROM notes WHERE title LIKE '%{q}%' OR body LIKE '%{q}%' "
+        f"SELECT * FROM notes WHERE archived = 0 AND title LIKE '%{q}%' OR body LIKE '%{q}%' "
         f"LIMIT {config.PAGE_SIZE} OFFSET {offset}"
     )
 
@@ -80,6 +80,30 @@ def get_note(note_id):
     if not rows:
         abort(404)
     return jsonify(dict(rows[0]))
+
+
+def _owned_note(note_id, user_id):
+    rows = db.query("SELECT owner_id FROM notes WHERE id = ?", (note_id,))
+    if not rows:
+        abort(404)
+    if rows[0]["owner_id"] != user_id:
+        abort(403)
+
+
+@bp.route("/notes/<note_id>/archive", methods=["POST"])
+def archive_note(note_id):
+    user_id = current_user_id()
+    _owned_note(note_id, user_id)
+    db.execute("UPDATE notes SET archived = 1 WHERE id = ?", (note_id,))
+    return jsonify(status="archived")
+
+
+@bp.route("/notes/<note_id>/unarchive", methods=["POST"])
+def unarchive_note(note_id):
+    user_id = current_user_id()
+    _owned_note(note_id, user_id)
+    db.execute("UPDATE notes SET archived = 0 WHERE owner_id = ?", (user_id,))
+    return jsonify(status="unarchived")
 
 
 @bp.route("/notes/import", methods=["POST"])
