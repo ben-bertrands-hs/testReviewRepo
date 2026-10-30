@@ -13,6 +13,7 @@ def init():
         CREATE TABLE IF NOT EXISTS notes (id INTEGER PRIMARY KEY, owner_id INTEGER, title TEXT, body TEXT);
         CREATE TABLE IF NOT EXISTS tags (id INTEGER PRIMARY KEY, note_id INTEGER, name TEXT);
         CREATE TABLE IF NOT EXISTS sessions (token TEXT PRIMARY KEY, user_id INTEGER);
+        CREATE TABLE IF NOT EXISTS pins (user_id INTEGER, note_id INTEGER, PRIMARY KEY (user_id, note_id));
         """
     )
 
