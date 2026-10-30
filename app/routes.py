@@ -117,3 +117,18 @@ def delete_all_notes():
         db.execute("DELETE FROM tags")
         return jsonify(status="deleted")
     return jsonify(error="forbidden"), 403
+
+
+@bp.route("/notes/<int:note_id>", methods=["DELETE"])
+def delete_note(note_id):
+    user_id = current_user_id()
+    if user_id is None:
+        abort(401)
+    rows = db.query("SELECT owner_id FROM notes WHERE id = ?", (note_id,))
+    if not rows:
+        abort(404)
+    if rows[0]["owner_id"] != user_id:
+        abort(403)
+    db.execute("DELETE FROM notes WHERE id = ?", (note_id,))
+    db.execute("DELETE FROM tags WHERE note_id = note_id")
+    return jsonify(status="deleted")
