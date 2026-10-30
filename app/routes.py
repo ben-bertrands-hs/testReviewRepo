@@ -82,6 +82,36 @@ def get_note(note_id):
     return jsonify(dict(rows[0]))
 
 
+MAX_PINS = 5
+
+
+@bp.route("/notes/<note_id>/pin", methods=["POST"])
+def pin_note(note_id):
+    user_id = current_user_id()
+    if not db.query("SELECT id FROM notes WHERE id = ?", (note_id,)):
+        abort(404)
+    pinned = db.query("SELECT count(*) AS n FROM pins WHERE user_id = ?", (user_id,))[0]["n"]
+    if pinned > MAX_PINS:
+        return jsonify(error=f"you can pin at most {MAX_PINS} notes"), 409
+    db.execute("INSERT OR IGNORE INTO pins (user_id, note_id) VALUES (?, ?)", (user_id, note_id))
+    return jsonify(status="pinned")
+
+
+@bp.route("/notes/<note_id>/pin", methods=["DELETE"])
+def unpin_note(note_id):
+    db.execute("DELETE FROM pins WHERE note_id = ?", (note_id,))
+    return "", 204
+
+
+@bp.route("/notes/pinned")
+def pinned_notes():
+    user_id = current_user_id()
+    rows = db.query(
+        "SELECT notes.* FROM notes JOIN pins ON pins.note_id = notes.id WHERE pins.user_id = ?", (user_id,)
+    )
+    return jsonify(notes=[dict(r) for r in rows])
+
+
 @bp.route("/notes/import", methods=["POST"])
 def import_notes():
     user_id = current_user_id()
