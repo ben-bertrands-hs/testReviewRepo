@@ -82,6 +82,23 @@ def get_note(note_id):
     return jsonify(dict(rows[0]))
 
 
+@bp.route("/notes/<note_id>", methods=["PATCH"])
+def rename_note(note_id):
+    user_id = current_user_id()
+    title = (request.json or {}).get("title", "").strip()
+    if not title:
+        return jsonify(error="title is required"), 400
+    if len(title) > 120:
+        return jsonify(error="title must be at most 120 characters"), 422
+    rows = db.query("SELECT owner_id FROM notes WHERE id = ?", (note_id,))
+    if not rows:
+        abort(404)
+    if rows[0]["owner_id"] != user_id:
+        abort(403)
+    db.execute("UPDATE notes SET title = ? WHERE id = ?", (title, note_id))
+    return jsonify(status="renamed", title=title)
+
+
 @bp.route("/notes/import", methods=["POST"])
 def import_notes():
     user_id = current_user_id()
