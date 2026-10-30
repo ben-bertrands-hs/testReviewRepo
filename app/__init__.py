@@ -8,8 +8,10 @@ def create_app():
     app.secret_key = config.SECRET_KEY
 
     from app.routes import bp
+    from app.sharing import bp as sharing_bp
     from app.webhooks import webhooks_bp
 
     app.register_blueprint(bp)
     app.register_blueprint(webhooks_bp)
+    app.register_blueprint(sharing_bp)
     return app
