@@ -20,6 +20,8 @@ The service stores notes in PostgreSQL. Set `DATABASE_URL` before starting it.
 | `GET` | `/notes?q=&page=` | Search notes |
 | `POST` | `/notes` | Create a note |
 | `GET` | `/notes/<id>` | Fetch a note |
+| `POST` | `/notes/<id>/archive` | Archive a note; it no longer appears in search |
+| `POST` | `/notes/<id>/unarchive` | Restore an archived note |
 | `POST` | `/notes/import` | Bulk import notes |
 | `GET` | `/notes/export?name=` | Export all notes to a file |
 | `GET` | `/attachments/<name>` | Download an attachment |
